@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting Xpress - Project Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+    <!-- Notification System -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo">
+            <!-- Replace this div with your actual logo image -->
+            <img src="assets/images/logo.png" alt="Reporting Xpress" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="logo-icon" style="display:none;">RX</div>
+            <span>Reporting Xpress</span>
+        </a>
+        
+        <div class="search-container">
+            <div class="search-icon">🔍</div>
+            <input type="text" class="search-input" id="searchInput" placeholder='Search projects: "endowment", "Business", fund number, etc.'>
+        </div>
+        
+        <div class="user-menu">
+            <span>Welcome, <span id="userName">Development Team</span></span>
+            <div class="user-avatar" id="userAvatar">DT</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="page-title">Project Dashboard</h1>
+            <p class="page-subtitle">Overview of managed projects with quick access to financial reports</p>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="view-toggle">
+                <button class="toggle-btn active" data-view="projects">Single Projects</button>
+                <button class="toggle-btn" data-view="summary">Summary Reports</button>
+            </div>
+            
+            <div class="filter-controls">
+                <select class="filter-dropdown" id="fundTypeFilter">
+                    <option value="">All Fund Types</option>
+                    <option value="endowment">Endowments Only</option>
+                    <option value="unrestricted">Unrestricted Only</option>
+                    <option value="restricted">Restricted Only</option>
+                </select>
+                <select class="filter-dropdown" id="collegeFilter">
+                    <option value="">All Colleges</option>
+                    <option value="business">College of Business</option>
+                    <option value="engineering">College of Engineering</option>
+                    <option value="libraries">University Libraries</option>
+                    <option value="research">Research Foundation</option>
+                </select>
+                <select class="filter-dropdown" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="alert">Needs Attention</option>
+                    <option value="warning">Watch List</option>
+                    <option value="normal">Normal</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Statistics Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalProjects">0</div>
+                <div class="stat-label">Total Projects</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="endowmentCount">0</div>
+                <div class="stat-label">Endowments</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="alertCount">0</div>
+                <div class="stat-label">Need Attention</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalBalance">$0</div>
+                <div class="stat-label">Total Balance</div>
+            </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Projects will be populated by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal for Report Details -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Report Details</h2>
+            <div id="modalContent">
+                <p>Loading report...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
