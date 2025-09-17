@@ -194,15 +194,9 @@ function renderProjects() {
 
 // Update statistics bar
 function updateStats() {
-    const totalProjects = filteredProjects.length;
-    const endowmentCount = filteredProjects.filter(p => p.type === 'endowment').length;
-    const alertCount = filteredProjects.filter(p => p.status === 'alert' || p.status === 'warning').length;
-    const totalBalance = filteredProjects.reduce((sum, p) => sum + p.balance, 0);
-    
-    document.getElementById('totalProjects').textContent = totalProjects;
-    document.getElementById('endowmentCount').textContent = endowmentCount;
-    document.getElementById('alertCount').textContent = alertCount;
-    document.getElementById('totalBalance').textContent = formatCurrencyShort(totalBalance);
+    // Stats bar removed - no longer calculating or displaying statistics
+    // This function is kept for compatibility but does nothing
+    return;
 }
 
 // =====================================
@@ -219,23 +213,44 @@ function handleReportClick(reportType, projectId) {
         return;
     }
 
-    // Check if using shared documents or local files
-    if (appConfig.reports.useSharedDocuments) {
-        openSharedDocument(project, reportType);
-    } else {
-        openLocalReport(project, reportType);
-    }
+    // Open PDF directly instead of showing modal
+    openPDFReport(project, reportType);
 }
 
-// Open shared document (Google Drive, SharePoint, etc.)
-function openSharedDocument(project, reportType) {
-    const reportUrl = project.reports[reportType];
+// Add this new function for mixed Excel/PDF report handling:
+function openPDFReport(project, reportType) {
+    // Demo reports: Excel for financial reports, PDF for fund information
+    const demoReports = {
+        income: 'assets/docs/sample-reports/sample-income-statement.xlsx',
+        activity: 'assets/docs/sample-reports/sample-activity-report.xlsx', 
+        information: 'assets/docs/sample-reports/sample-fund-information.pdf'
+    };
     
-    // For demo purposes, we'll show a modal instead of opening actual documents
-    showReportModal(project, reportType, 'shared');
+    const fileUrl = demoReports[reportType] || demoReports.income;
+    const isExcel = fileUrl.endsWith('.xlsx');
+    const isPDF = fileUrl.endsWith('.pdf');
     
-    // In real implementation, you might do:
-    // window.open(reportUrl, '_blank');
+    if (isExcel) {
+        // Handle Excel files - download them
+        showNotification(`Downloading ${appConfig.reports.types[reportType].name} for ${project.title}...`, 'info');
+        
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${project.fundNumber}-${reportType}-report.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Show success message after slight delay
+        setTimeout(() => {
+            showNotification(`${appConfig.reports.types[reportType].name} downloaded successfully!`, 'success');
+        }, 1000);
+        
+    } else if (isPDF) {
+        // Handle PDF files - open in new tab
+        showNotification(`Opening ${appConfig.reports.types[reportType].name} for ${project.title}...`, 'info');
+        window.open(fileUrl, '_blank');
+    }
 }
 
 // Open local report file
