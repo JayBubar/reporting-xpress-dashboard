@@ -6,6 +6,40 @@
 let filteredProjects = [...projectsData];
 let currentView = 'projects';
 
+// Summary Reports Data
+const summaryReportsData = [
+    {
+        id: 'quarterly-summary',
+        title: 'Quarterly Financial Summary',
+        description: 'Comprehensive financial overview for all endowments and operating funds for Q3 2025',
+        reportType: 'quarterly',
+        dateRange: 'July 1 - September 30, 2025',
+        includesProjects: 6,
+        totalValue: '$9.3M',
+        lastGenerated: 'September 15, 2025',
+        status: 'ready',
+        downloadFiles: {
+            excel: 'assets/docs/sample-reports/quarterly-summary.xlsx',
+            pdf: 'assets/docs/sample-reports/quarterly-summary.pdf'
+        }
+    },
+    {
+        id: 'endowment-performance',
+        title: 'Endowment Performance Report',
+        description: 'Annual performance analysis for all endowment funds with investment returns and distributions',
+        reportType: 'annual',
+        dateRange: 'January 1 - September 30, 2025',
+        includesProjects: 3,
+        totalValue: '$4.1M',
+        lastGenerated: 'September 1, 2025',
+        status: 'ready',
+        downloadFiles: {
+            excel: 'assets/docs/sample-reports/endowment-performance.xlsx',
+            pdf: 'assets/docs/sample-reports/endowment-performance.pdf'
+        }
+    }
+];
+
 // =====================================
 // UTILITY FUNCTIONS
 // =====================================
@@ -122,6 +156,56 @@ function generateReportLinks(project) {
     return linksHTML;
 }
 
+// Generate Summary Report Card HTML
+function generateSummaryReportCard(report) {
+    const statusClass = report.status === 'ready' ? 'status-ready' : 'status-processing';
+
+    return `
+        <div class="summary-report-card ${statusClass}" data-report-id="${report.id}">
+            <div class="summary-report-header">
+                <h3 class="summary-report-title">${report.title}</h3>
+                <div class="report-status ${statusClass}">${report.status.toUpperCase()}</div>
+            </div>
+
+            <div class="summary-report-content">
+                <p class="report-description">${report.description}</p>
+
+                <div class="report-metrics">
+                    <div class="metric-item">
+                        <div class="metric-label">Date Range</div>
+                        <div class="metric-value">${report.dateRange}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Projects Included</div>
+                        <div class="metric-value">${report.includesProjects} funds</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Total Value</div>
+                        <div class="metric-value">${report.totalValue}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Last Generated</div>
+                        <div class="metric-value">${report.lastGenerated}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-report-actions">
+                <button class="summary-download-btn excel-btn"
+                        onclick="downloadSummaryReport('${report.id}', 'excel')"
+                        title="Download Excel Version">
+                    📊 Download Excel
+                </button>
+                <button class="summary-download-btn pdf-btn"
+                        onclick="downloadSummaryReport('${report.id}', 'pdf')"
+                        title="Download PDF Version">
+                    📄 View PDF
+                </button>
+            </div>
+        </div>
+    `;
+}
+
 // =====================================
 // DATA FILTERING AND SEARCH
 // =====================================
@@ -190,6 +274,22 @@ function renderProjects() {
     }
     
     updateStats();
+}
+
+// Render Summary Reports
+function renderSummaryReports() {
+    const container = document.getElementById('projectsGrid');
+
+    if (summaryReportsData.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--neutral-500);">
+                <h3>Summary Reports</h3>
+                <p>Summary reports will be available here when generated</p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = summaryReportsData.map(generateSummaryReportCard).join('');
+    }
 }
 
 // Update statistics bar
@@ -397,6 +497,40 @@ function emailReport(reportType, projectId) {
     }, 2000);
 }
 
+// Download Summary Report Function
+function downloadSummaryReport(reportId, fileType) {
+    const report = summaryReportsData.find(r => r.id === reportId);
+    if (!report) {
+        showNotification('Report not found', 'error');
+        return;
+    }
+
+    const fileUrl = report.downloadFiles[fileType];
+    const isExcel = fileType === 'excel';
+    const isPDF = fileType === 'pdf';
+
+    if (isExcel) {
+        // Download Excel file
+        showNotification(`Downloading ${report.title} (Excel)...`, 'info');
+
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${report.id}-${fileType}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => {
+            showNotification(`${report.title} downloaded successfully!`, 'success');
+        }, 1000);
+
+    } else if (isPDF) {
+        // Open PDF in new tab
+        showNotification(`Opening ${report.title} (PDF)...`, 'info');
+        window.open(fileUrl, '_blank');
+    }
+}
+
 // =====================================
 // EVENT LISTENERS AND INITIALIZATION
 // =====================================
@@ -436,11 +570,11 @@ function setupEventListeners() {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
+
             currentView = this.dataset.view;
-            
+
             if (currentView === 'summary') {
-                showNotification('Summary Reports view - Coming soon in Phase 2!', 'info');
+                renderSummaryReports();
             } else {
                 renderProjects();
             }
@@ -496,3 +630,4 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 // Expose functions to global scope for onclick handlers
 window.downloadReport = downloadReport;
 window.emailReport = emailReport;
+window.downloadSummaryReport = downloadSummaryReport;
