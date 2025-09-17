@@ -1,8 +1,10 @@
 // Reporting Xpress Dashboard - Sample Data Configuration
 
 // Application Configuration
-const AppConfig = {
-    organizationName: "Reporting Xpress Foundation",
+const appConfig = {
+    organization: {
+        name: "Reporting Xpress Foundation"
+    },
     version: "1.0.0",
     lastUpdated: "2025-09-17"
 };
@@ -225,7 +227,7 @@ const reportTemplates = {
 // Export for module use (if using modules)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        AppConfig,
+        appConfig,
         projectsData,
         fundTypes,
         statusTypes,
